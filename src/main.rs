@@ -1,26 +1,33 @@
-use std::{
-    io::{BufReader, prelude::*},
-    net::{TcpListener, TcpStream},
-};
+use actix_web::{get, web, App, HttpServer, Responder};
+use tera::{Tera, Context};
 
-fn handle_connection(mut stream: TcpStream){
-	let buf_reader = BufReader::new(&stream);
-	let http_request: Vec<_> = buf_reader
-	    .lines()
-	    .map(|result| result.unwrap())
-	    .take_while(|line| !line.is_empty())
-	    .collect();
+#[get("/")]
+async fn index() -> impl Responder {
+	let terra = match Tera::new("templates/**/*"){
+		Ok(t) => t,
+		Err(e) => {
+			eprintln!("Parsing error(s): {}", e);
+			::std:process::exit(1);
+		}
+	};
 
-	println!("Request: {http_request:#?}");
+	// Context for the data to put in
+	let mut context = Context::new();
+	context.insert("hello", "HelloWorld!");
+
+	// Renders the template
+	let rendered = tera.render("index.html", &context).unwrap();
+
+	web::HttpResponse::Ok()
+		.content_type("text/html")
+		.body(rendered)
 
 }
 
-fn main() {
-	let listener = TcpListener::bind("127.0.0.1:8080").unwrap();
-    
-	for stream in listener.incoming() {
-		let stream = stream.unwrap();
-	
-		handle_connection(stream);
-	}
+#[actix_web::main]
+async fn main() -> std::io::Resutl<()> {
+	HttpServer::new(|| App:new().service(index))
+		.bind("127.0.0.1:8080")?
+		.run()
+		.await
 }

@@ -7,7 +7,7 @@ async fn index() -> impl Responder {
 		Ok(t) => t,
 		Err(e) => {
 			eprintln!("Parsing error(s): {}", e);
-			::std:process::exit(1);
+			::std::process::exit(1);
 		}
 	};
 
@@ -25,8 +25,8 @@ async fn index() -> impl Responder {
 }
 
 #[actix_web::main]
-async fn main() -> std::io::Resutl<()> {
-	HttpServer::new(|| App:new().service(index))
+fn main() -> std::io::Resutl<()> {
+	HttpServer::new(|| App::new().service(index))
 		.bind("127.0.0.1:8080")?
 		.run()
 		.await

@@ -3,7 +3,7 @@ use tera::{Tera, Context};
 
 #[get("/")]
 async fn index() -> impl Responder {
-	let terra = match Tera::new("templates/**/*"){
+	let tera = match Tera::new("templates/**/*"){
 		Ok(t) => t,
 		Err(e) => {
 			eprintln!("Parsing error(s): {}", e);
@@ -25,7 +25,7 @@ async fn index() -> impl Responder {
 }
 
 #[actix_web::main]
-fn main() -> std::io::Resutl<()> {
+fn main() -> std::io::Result<()> {
 	HttpServer::new(|| App::new().service(index))
 		.bind("127.0.0.1:8080")?
 		.run()

@@ -1,4 +1,4 @@
-use actix_web::{get, web, App, HttpServer, Responder};
+use actix_web::{get, web, App, HttpServer, Responder, HttpResponse};
 use tera::{Tera, Context};
 
 #[get("/")]
@@ -14,18 +14,19 @@ async fn index() -> impl Responder {
 	// Context for the data to put in
 	let mut context = Context::new();
 	context.insert("hello", "HelloWorld!");
+	context.insert("name", "User");
 
 	// Renders the template
 	let rendered = tera.render("index.html", &context).unwrap();
 
-	web::HttpResponse::Ok()
+	actix_web::HttpResponse::Ok()
 		.content_type("text/html")
 		.body(rendered)
 
 }
 
 #[actix_web::main]
-fn main() -> std::io::Result<()> {
+async fn main() -> std::io::Result<()> {
 	HttpServer::new(|| App::new().service(index))
 		.bind("127.0.0.1:8080")?
 		.run()
